@@ -134,6 +134,13 @@ novoEventoForm.addEventListener('submit', async (e) => {
         // Se tiver imagem, fazer upload no Supabase
         if (imagemSelecionada) {
             imagemUrl = await uploadImagemSupabase(imagemSelecionada);
+
+            if (!imagemUrl) {
+                // Se deu erro no upload, para o submit
+                showError(formError, 'Não foi possível enviar a imagem. Evento não criado.');
+                showLoading(false);
+                return; // <-- PARA A EXECUÇÃO AQUI
+            }
         }
 
         // Processar participantes
@@ -158,7 +165,6 @@ novoEventoForm.addEventListener('submit', async (e) => {
         };
 
         const docRef = await db.collection('eventos').add(novoEvento);
-
         console.log('Evento criado:', docRef.id);
 
         // Redirecionar para home
