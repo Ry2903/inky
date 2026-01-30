@@ -18,26 +18,28 @@ let currentEvento = null;
 let currentEventoId = null;
 let allParticipantes = [];
 
-// Inicializar
+// Inicialização
 auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        currentUser = user;
-        await user.reload();
-        const nomeUsuario = user.displayName || user.email.split('@')[0];
-        userNameEl.textContent = `Olá, ${nomeUsuario}`;
-        
-        // Pegar ID do evento da URL
-        const params = new URLSearchParams(window.location.search);
-        currentEventoId = params.get('id');
-        
-        if (currentEventoId) {
-            loadEvento();
-        } else {
-            window.location.href = 'home.html';
-        }
-    } else {
+    if (!user) {
         window.location.href = 'index.html';
+        return;
     }
+
+    currentUser = user;
+    await user.reload();
+
+    const nomeUsuario = user.displayName || user.email.split('@')[0];
+    userNameEl.textContent = `Olá, ${nomeUsuario}`;
+
+    const params = new URLSearchParams(window.location.search);
+    currentEventoId = params.get('id');
+
+    if (!currentEventoId) {
+        window.location.href = 'home.html';
+        return;
+    }
+
+    loadEvento();
 });
 
 // Carregar evento
@@ -47,40 +49,32 @@ async function loadEvento() {
         participantesContainer.innerHTML = '';
         emptyState.classList.add('hidden');
 
-        const docSnapshot = await db.collection('eventos').doc(currentEventoId).get();
+        const doc = await db.collection('eventos').doc(currentEventoId).get();
 
-        if (!docSnapshot.exists) {
+        if (!doc.exists) {
             loadingEvento.style.display = 'none';
             emptyState.classList.remove('hidden');
             emptyState.querySelector('p').textContent = 'Evento não encontrado';
             return;
         }
 
-        currentEvento = {
-            id: docSnapshot.id,
-            ...docSnapshot.data()
-        };
+        currentEvento = { id: doc.id, ...doc.data() };
 
-        // Preencher info do evento
         nomeEvento.textContent = currentEvento.nome;
         autorEvento.textContent = `Criado por: ${currentEvento.nomeAutor}`;
 
-        // Mostrar botão excluir apenas se o usuário é o criador
         if (currentEvento.criadoPor === currentUser.uid) {
             btnExcluir.classList.remove('hidden');
         }
 
-        // Armazenar participantes
         allParticipantes = currentEvento.participantes || [];
 
         loadingEvento.style.display = 'none';
         renderParticipantes(allParticipantes);
 
     } catch (error) {
-        console.error('Erro ao carregar evento:', error);
+        console.error(error);
         loadingEvento.style.display = 'none';
-        emptyState.classList.remove('hidden');
-        emptyState.querySelector('p').textContent = 'Erro ao carregar evento';
     }
 }
 
@@ -91,124 +85,68 @@ function renderParticipantes(participantes) {
         return;
     }
 
-    const isCreador = currentEvento.criadoPor === currentUser.uid;
-
     participantesContainer.innerHTML = participantes.map((p, index) => `
         <div class="participante-item">
             <div class="participante-info">
                 <div class="participante-nome">${p.nome}</div>
                 <div class="participante-status">
-                    ${p.dataCheckin 
-                        ? `Check-in: ${new Date(p.dataCheckin).toLocaleDateString('pt-BR', {hour: '2-digit', minute: '2-digit'})}` 
+                    ${p.dataCheckin
+                        ? `Check-in: ${new Date(p.dataCheckin).toLocaleString('pt-BR')}`
                         : 'Sem check-in'}
                 </div>
             </div>
+
             <div class="participante-actions">
-                ${isCreador ? `
-                    ${p.validado 
-                        ? `<button class="btn-validado" onclick="desvalidarParticipante(${index})">OK!</button>`
-                        : `<button class="btn-validar" onclick="validarParticipante(${index})">Validar Check-in</button>`
-                    }
-                    <button class="btn-remover" onclick="removerParticipante(${index})" title="Remover">
+                ${!p.dataCheckin
+                    ? `<button class="btn-validar" onclick="fazerCheckIn(${index})">
+                        Fazer Check-in
+                      </button>`
+                    : `<span class="participante-status">Check-in realizado</span>`
+                }
+
+                ${currentEvento.criadoPor === currentUser.uid
+                    ? `<button class="btn-remover" onclick="removerParticipante(${index})">
                         <i class="fas fa-times"></i>
-                    </button>
-                ` : `
-                    ${!p.dataCheckin 
-                        ? `<button class="btn-validar" onclick="fazerCheckIn(${index})">Fazer Check-in</button>`
-                        : `<span class="participante-status">Check-in realizado</span>`
-                    }
-                `}
+                      </button>`
+                    : ''
+                }
             </div>
         </div>
     `).join('');
 }
 
-// Fazer check-in
+// 🚨 CHECK-IN LIVRE — QUALQUER USUÁRIO, QUALQUER PARTICIPANTE
 async function fazerCheckIn(index) {
     try {
-        const participante = allParticipantes[index];
-        
-        // Verificar se o participante atual é o mesmo que quer fazer check-in
-        if (participante.nome.toLowerCase().trim() !== (currentUser.displayName || currentUser.email.split('@')[0]).toLowerCase().trim()) {
-            alert('Você só pode fazer check-in para si mesmo');
-            return;
-        }
+        allParticipantes[index].dataCheckin = new Date().toISOString();
 
-        participante.dataCheckin = new Date().toISOString();
-
-        // Atualizar no Firestore
-        await db.collection('eventos').doc(currentEventoId).update({
-            participantes: allParticipantes
-        });
+        await db.collection('eventos')
+            .doc(currentEventoId)
+            .update({ participantes: allParticipantes });
 
         renderParticipantes(allParticipantes);
     } catch (error) {
-        console.error('Erro ao fazer check-in:', error);
+        console.error('Erro no check-in:', error);
         alert('Erro ao fazer check-in');
     }
 }
 
-// Validar participante (só criador)
-async function validarParticipante(index) {
-    try {
-        if (currentEvento.criadoPor !== currentUser.uid) {
-            alert('Apenas o criador do evento pode validar participantes');
-            return;
-        }
-
-        allParticipantes[index].validado = true;
-
-        await db.collection('eventos').doc(currentEventoId).update({
-            participantes: allParticipantes
-        });
-
-        renderParticipantes(allParticipantes);
-    } catch (error) {
-        console.error('Erro ao validar:', error);
-        alert('Erro ao validar participante');
-    }
-}
-
-// Desvalidar participante (só criador)
-async function desvalidarParticipante(index) {
-    try {
-        if (currentEvento.criadoPor !== currentUser.uid) {
-            alert('Apenas o criador do evento pode desvalidar participantes');
-            return;
-        }
-
-        allParticipantes[index].validado = false;
-
-        await db.collection('eventos').doc(currentEventoId).update({
-            participantes: allParticipantes
-        });
-
-        renderParticipantes(allParticipantes);
-    } catch (error) {
-        console.error('Erro ao desvalidar:', error);
-        alert('Erro ao desvalidar participante');
-    }
-}
-
-// Remover participante (só criador)
+// Remover participante (apenas criador)
 async function removerParticipante(index) {
+    if (currentEvento.criadoPor !== currentUser.uid) return;
+
+    if (!confirm(`Remover ${allParticipantes[index].nome}?`)) return;
+
     try {
-        if (currentEvento.criadoPor !== currentUser.uid) {
-            alert('Apenas o criador do evento pode remover participantes');
-            return;
-        }
+        allParticipantes.splice(index, 1);
 
-        if (confirm(`Tem certeza que deseja remover ${allParticipantes[index].nome}?`)) {
-            allParticipantes.splice(index, 1);
+        await db.collection('eventos')
+            .doc(currentEventoId)
+            .update({ participantes: allParticipantes });
 
-            await db.collection('eventos').doc(currentEventoId).update({
-                participantes: allParticipantes
-            });
-
-            renderParticipantes(allParticipantes);
-        }
+        renderParticipantes(allParticipantes);
     } catch (error) {
-        console.error('Erro ao remover:', error);
+        console.error(error);
         alert('Erro ao remover participante');
     }
 }
@@ -216,44 +154,31 @@ async function removerParticipante(index) {
 // Buscar participantes
 searchInput.addEventListener('input', (e) => {
     const termo = e.target.value.toLowerCase().trim();
-    
+
     if (!termo) {
         renderParticipantes(allParticipantes);
         return;
     }
 
-    const filtrados = allParticipantes.filter(p => 
-        p.nome.toLowerCase().includes(termo)
+    renderParticipantes(
+        allParticipantes.filter(p =>
+            p.nome.toLowerCase().includes(termo)
+        )
     );
-
-    renderParticipantes(filtrados);
 });
 
 // Logout
 async function logout() {
-    try {
-        await auth.signOut();
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Erro ao fazer logout:', error);
-    }
+    await auth.signOut();
+    window.location.href = 'index.html';
 }
 
 // Excluir evento
 async function excluirEvento() {
-    try {
-        if (currentEvento.criadoPor !== currentUser.uid) {
-            alert('Apenas o criador pode excluir este evento');
-            return;
-        }
+    if (currentEvento.criadoPor !== currentUser.uid) return;
 
-        if (confirm(`Tem certeza que deseja excluir o evento "${currentEvento.nome}"? Esta ação não pode ser desfeita.`)) {
-            await db.collection('eventos').doc(currentEventoId).delete();
-            alert('Evento excluído com sucesso');
-            window.location.href = 'home.html';
-        }
-    } catch (error) {
-        console.error('Erro ao excluir evento:', error);
-        alert('Erro ao excluir evento');
-    }
+    if (!confirm(`Excluir o evento "${currentEvento.nome}"?`)) return;
+
+    await db.collection('eventos').doc(currentEventoId).delete();
+    window.location.href = 'home.html';
 }

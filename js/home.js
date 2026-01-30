@@ -29,13 +29,14 @@ auth.onAuthStateChanged((user) => {
 function loadEvents() {
     try {
         loadingEvents.style.display = 'flex';
-        eventsContainer.innerHTML = '';
-        emptyState.classList.add('hidden');
 
         // Usar onSnapshot para atualizar em tempo real
         db.collection('eventos').onSnapshot((querySnapshot) => {
+            console.log('Atualizando eventos...');
+            
             if (querySnapshot.empty) {
                 loadingEvents.style.display = 'none';
+                eventsContainer.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
@@ -48,12 +49,14 @@ function loadEvents() {
                 });
             });
 
+            console.log('Total de eventos:', events.length);
             loadingEvents.style.display = 'none';
             renderEvents(events);
 
         }, (error) => {
             console.error('Erro ao carregar eventos:', error);
             loadingEvents.style.display = 'none';
+            eventsContainer.innerHTML = '';
             emptyState.classList.remove('hidden');
             emptyState.querySelector('p').textContent = 'Erro ao carregar eventos';
         });
@@ -61,6 +64,7 @@ function loadEvents() {
     } catch (error) {
         console.error('Erro ao carregar eventos:', error);
         loadingEvents.style.display = 'none';
+        eventsContainer.innerHTML = '';
         emptyState.classList.remove('hidden');
         emptyState.querySelector('p').textContent = 'Erro ao carregar eventos';
     }
@@ -84,8 +88,6 @@ function renderEvents(events) {
         const checkinsRealizados = event.participantes 
             ? event.participantes.filter(p => p.dataCheckin && p.dataCheckin !== null && p.dataCheckin !== '').length 
             : 0;
-
-        console.log(`Evento: ${event.nome}, Total: ${totalParticipantes}, Check-ins: ${checkinsRealizados}`);
 
         return `
         <a href="evento.html?id=${event.id}" class="event-card">
