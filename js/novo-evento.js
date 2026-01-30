@@ -14,9 +14,6 @@ const imageError = document.getElementById('imageError');
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Supabase
-// Assumindo que você já inicializou o supabase com `supabase = createClient(...)`
-
 // Variável para armazenar a imagem selecionada
 let imagemSelecionada = null;
 
@@ -47,9 +44,10 @@ imagemInput.addEventListener('change', (e) => {
         return;
     }
 
-    imagemSelecionada = arquivo; // manter o arquivo original para upload
+    // Armazenar imagem e mostrar preview
+    imagemSelecionada = arquivo;
+    imageError.classList.remove('show');
 
-    // Preview da imagem (desktop e mobile)
     const reader = new FileReader();
     reader.onload = (event) => {
         imagemPreview.src = event.target.result;
@@ -77,28 +75,6 @@ function showError(element, message) {
 // Mostrar loading
 function showLoading(show = true) {
     loadingSpinner.classList.toggle('hidden', !show);
-}
-
-// Função de upload de imagem para o Supabase
-async function uploadImagemSupabase(file) {
-    try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const { data, error } = await supabase.storage
-            .from('eventos')
-            .upload(fileName, file); // enviando File diretamente
-
-        if (error) throw error;
-
-        // Retornar URL pública
-        const { publicUrl } = supabase.storage.from('eventos').getPublicUrl(fileName);
-        return publicUrl;
-
-    } catch (err) {
-        console.error('Erro no upload Supabase:', err);
-        showError(imageError, 'Erro ao enviar a imagem');
-        return null;
-    }
 }
 
 // Submeter formulário
@@ -131,16 +107,9 @@ novoEventoForm.addEventListener('submit', async (e) => {
     try {
         let imagemUrl = null;
 
-        // Se tiver imagem, fazer upload no Supabase
+        // Se tiver imagem, fazer upload no Supabase usando a função do supabase-config.js
         if (imagemSelecionada) {
             imagemUrl = await uploadImagemSupabase(imagemSelecionada);
-
-            if (!imagemUrl) {
-                // Se deu erro no upload, para o submit
-                showError(formError, 'Não foi possível enviar a imagem. Evento não criado.');
-                showLoading(false);
-                return; // <-- PARA A EXECUÇÃO AQUI
-            }
         }
 
         // Processar participantes
@@ -165,6 +134,7 @@ novoEventoForm.addEventListener('submit', async (e) => {
         };
 
         const docRef = await db.collection('eventos').add(novoEvento);
+
         console.log('Evento criado:', docRef.id);
 
         // Redirecionar para home
