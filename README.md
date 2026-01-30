@@ -19,4 +19,8 @@ O objetivo do projeto é simplificar o processo de check-in, reduzir erros manua
 - Banco de Dados: Firestore
 - Armazenamento de arquivos: Supabase
 - Design: Figma
+<<<<<<< HEAD
 - Hospedagem: Vercel
+=======
+- Hospedagem: Vercel
+>>>>>>> 614ee9f14d89c7c0bde7c8ea161e1c6b96c05b6b
