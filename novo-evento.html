@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INKY. - Novo Evento</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles-novo-evento.css">
+    <link rel="icon" href="../assets/logo.png" type="image/x-icon">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="btn-back" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <img src="assets/logotipo.png" alt="INKY" class="header-logo">
+            <div style="width: 20px;"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Novo Evento</h1>
+
+        <form id="novoEventoForm" class="form-container">
+            <!-- Upload de Imagem -->
+            <div class="form-section">
+                <label class="upload-area" for="imagemInput">
+                    <input 
+                        type="file" 
+                        id="imagemInput" 
+                        accept="image/*" 
+                        style="display: none;"
+                    >
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Toque para adicionar imagem do evento</p>
+                    </div>
+                    <img id="imagemPreview" class="image-preview hidden" alt="Preview">
+                </label>
+                <div id="imageError" class="error-message"></div>
+            </div>
+
+            <!-- Nome do Evento -->
+            <div class="form-group">
+                <label for="nomeEvento">Nome do Evento *</label>
+                <input 
+                    type="text" 
+                    id="nomeEvento" 
+                    placeholder="Digite o nome do evento"
+                    required
+                >
+            </div>
+
+            <!-- Data -->
+            <div class="form-group">
+                <label for="dataEvento">Data *</label>
+                <input 
+                    type="date" 
+                    id="dataEvento"
+                    required
+                >
+            </div>
+
+            <!-- Local -->
+            <div class="form-group">
+                <label for="localEvento">Local</label>
+                <input 
+                    type="text" 
+                    id="localEvento" 
+                    placeholder="Onde será realizado?"
+                >
+            </div>
+
+            <!-- Descrição -->
+            <div class="form-group">
+                <label for="descricaoEvento">Descrição</label>
+                <textarea 
+                    id="descricaoEvento" 
+                    placeholder="Descrição do evento (opcional)"
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-buttons">
+                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Criar Evento
+                </button>
+            </div>
+
+            <div id="formError" class="error-message"></div>
+        </form>
+    </main>
+
+    <!-- Loading spinner -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="firebase-config-compat.js"></script>
+    <script src="js/novo-evento.js"></script>
+</body>
+</html>

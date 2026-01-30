@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INKY. - Home</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles-home.css">
+    <link rel="icon" href="../assets/logo.png" type="image/x-icon">
+
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/logotipo.png" alt="INKY" class="header-logo">
+            <div class="header-user">
+                <span id="userName">Olá, Usuário</span>
+                <button class="btn-logout" onclick="logout()" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <section class="events-section">
+            <h2 class="section-title">Check-Ins Disponíveis</h2>
+            
+            <!-- Loading -->
+            <div id="loadingEvents" class="loading-container">
+                <div class="spinner"></div>
+                <p>Carregando eventos...</p>
+            </div>
+
+            <!-- Events Grid -->
+            <div id="eventsContainer" class="events-grid">
+                <!-- Eventos serão inseridos aqui via JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state hidden">
+                <i class="far fa-calendar"></i>
+                <p>Nenhum evento disponível no momento</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Action Button -->
+    <a href="novo-evento.html" class="fab" title="Criar novo evento">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    <!-- Scripts Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="firebase-config-compat.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
