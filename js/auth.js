@@ -131,6 +131,9 @@ signupForm.addEventListener('submit', async (e) => {
             displayName: name
         });
         
+        // IMPORTANTE: Recarregar o usuário pra pegar os novos dados
+        await userCredential.user.reload();
+        
         console.log('Cadastro bem-sucedido:', userCredential.user);
         
         // Redirecionar para home

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INKY. - Evento</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles-evento.css">
+    <link rel="icon" href="../assets/logo.png" type="image/x-icon">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="btn-back" onclick="window.history.back()" title="Voltar">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <img src="assets/logotipo.png" alt="INKY" class="header-logo">
+            <div class="header-user">
+                <span id="userName">Olá, Usuário</span>
+                <button id="btnExcluir" class="btn-excluir hidden" onclick="excluirEvento()" title="Excluir evento">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="btn-logout" onclick="logout()" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Evento Info -->
+        <div class="evento-header">
+            <h1 id="nomeEvento" class="evento-title">Carregando...</h1>
+            <p id="autorEvento" class="evento-autor">Criado por: -</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input 
+                type="text" 
+                id="searchParticipante" 
+                placeholder="Procurar participante..."
+                class="search-input"
+            >
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingEvento" class="loading-container">
+            <div class="spinner"></div>
+            <p>Carregando evento...</p>
+        </div>
+
+        <!-- Participantes List -->
+        <div id="participantesContainer" class="participantes-container">
+            <!-- Participantes serão inseridos aqui -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+            <i class="fas fa-inbox"></i>
+            <p>Nenhum participante encontrado</p>
+        </div>
+    </main>
+
+    <!-- Scripts Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/evento.js"></script>
+</body>
+</html>

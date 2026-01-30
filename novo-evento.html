@@ -69,23 +69,13 @@
                 >
             </div>
 
-            <!-- Local -->
+            <!-- Participantes -->
             <div class="form-group">
-                <label for="localEvento">Local</label>
-                <input 
-                    type="text" 
-                    id="localEvento" 
-                    placeholder="Onde será realizado?"
-                >
-            </div>
-
-            <!-- Descrição -->
-            <div class="form-group">
-                <label for="descricaoEvento">Descrição</label>
+                <label for="participantesEvento">Insira os participantes separados por quebra de linha</label>
                 <textarea 
-                    id="descricaoEvento" 
-                    placeholder="Descrição do evento (opcional)"
-                    rows="4"
+                    id="participantesEvento" 
+                    placeholder="João Silva&#10;Maria Santos&#10;Pedro Oliveira"
+                    rows="6"
                 ></textarea>
             </div>
 
@@ -109,10 +99,11 @@
     </div>
 
     <!-- Scripts Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
-    <script src="firebase-config-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/novo-evento.js"></script>
 </body>
 </html>
