@@ -17,6 +17,7 @@ let currentUser = null;
 let currentEvento = null;
 let currentEventoId = null;
 let allParticipantes = [];
+let termoFiltro = ''; // guarda o termo de busca atual
 
 // Inicializar
 auth.onAuthStateChanged(async (user) => {
@@ -86,12 +87,26 @@ async function loadEvento() {
 
 // Renderizar participantes
 function renderParticipantes(participantes) {
-    if (participantes.length === 0) {
-        emptyState.classList.remove('hidden');
-        return;
+    // Aplicar filtro atual
+    let listaRender = participantes;
+    if (termoFiltro) {
+        listaRender = participantes.filter(p => 
+            p.nome.toLowerCase().includes(termoFiltro)
+        );
     }
 
-    participantesContainer.innerHTML = participantes.map((p, index) => `
+    if (listaRender.length === 0) {
+        emptyState.classList.remove('hidden');
+        participantesContainer.innerHTML = '';
+        return;
+    } else {
+        emptyState.classList.add('hidden');
+    }
+
+    participantesContainer.innerHTML = listaRender.map((p, idx) => {
+        // Encontrar índice real no array allParticipantes
+        const indexOriginal = allParticipantes.findIndex(ap => ap.nome === p.nome);
+        return `
         <div class="participante-item">
             <div class="participante-info">
                 <div class="participante-nome">${p.nome}</div>
@@ -103,17 +118,18 @@ function renderParticipantes(participantes) {
             </div>
             <div class="participante-actions">
                 ${p.dataCheckin 
-                    ? `<button class="btn-validado" onclick="fazerCheckIn(${index})">Desfazer Check-in</button>`
-                    : `<button class="btn-validar" onclick="fazerCheckIn(${index})">Fazer Check-in</button>`
+                    ? `<button class="btn-validado" onclick="fazerCheckIn(${indexOriginal})">Desfazer Check-in</button>`
+                    : `<button class="btn-validar" onclick="fazerCheckIn(${indexOriginal})">Fazer Check-in</button>`
                 }
                 ${currentEvento.criadoPor === currentUser.uid ? `
-                    <button class="btn-remover" onclick="removerParticipante(${index})" title="Remover">
+                    <button class="btn-remover" onclick="removerParticipante(${indexOriginal})" title="Remover">
                         <i class="fas fa-times"></i>
                     </button>
                 ` : ''}
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Fazer ou desfazer check-in (todos os usuários podem)
@@ -134,6 +150,7 @@ async function fazerCheckIn(index) {
             participantes: allParticipantes
         });
 
+        // Renderizar mantendo o filtro
         renderParticipantes(allParticipantes);
     } catch (error) {
         console.error('Erro ao atualizar check-in:', error);
@@ -166,18 +183,8 @@ async function removerParticipante(index) {
 
 // Buscar participantes
 searchInput.addEventListener('input', (e) => {
-    const termo = e.target.value.toLowerCase().trim();
-    
-    if (!termo) {
-        renderParticipantes(allParticipantes);
-        return;
-    }
-
-    const filtrados = allParticipantes.filter(p => 
-        p.nome.toLowerCase().includes(termo)
-    );
-
-    renderParticipantes(filtrados);
+    termoFiltro = e.target.value.toLowerCase().trim();
+    renderParticipantes(allParticipantes);
 });
 
 // Logout
@@ -208,3 +215,30 @@ async function excluirEvento() {
         alert('Erro ao excluir evento');
     }
 }
+
+
+const btnExportCheckins = document.getElementById('btnExportCheckins');
+
+btnExportCheckins.addEventListener('click', () => {
+    // Filtra apenas participantes com check-in
+    const checkins = allParticipantes.filter(p => p.dataCheckin);
+
+    if (checkins.length === 0) {
+        alert('Nenhum participante com check-in para exportar.');
+        return;
+    }
+
+    // Mapeia os dados para a planilha
+    const dados = checkins.map(p => ({
+        Nome: p.nome,
+        'Data Check-in': new Date(p.dataCheckin).toLocaleString('pt-BR')
+    }));
+
+    // Cria uma planilha
+    const ws = XLSX.utils.json_to_sheet(dados);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Check-ins');
+
+    // Salva o arquivo
+    XLSX.writeFile(wb, `${currentEvento.nome}_inky.xlsx`);
+});

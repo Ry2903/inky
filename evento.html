@@ -23,6 +23,9 @@
             <img src="assets/logotipo.png" alt="INKY" class="header-logo">
             <div class="header-user">
                 <span id="userName">Olá, Usuário</span>
+                <button id="btnExportCheckins" class="btn-excluir">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                </button>
                 <button id="btnExcluir" class="btn-excluir hidden" onclick="excluirEvento()" title="Excluir evento">
                     <i class="fas fa-trash"></i>
                 </button>
@@ -40,7 +43,7 @@
             <h1 id="nomeEvento" class="evento-title">Carregando...</h1>
             <p id="autorEvento" class="evento-autor">Criado por: -</p>
         </div>
-
+        
         <!-- Search Bar -->
         <div class="search-container">
             <i class="fas fa-search"></i>
@@ -82,6 +85,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="js/evento.js"></script>
 </body>
 </html>
