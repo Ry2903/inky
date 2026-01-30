@@ -6,7 +6,8 @@
 
 body {
     font-family: 'Nunito Sans', sans-serif;
-    background-color: #c1343f;
+    background: #C52F38;
+    background: linear-gradient(180deg,rgba(197, 47, 56, 1) 0%, rgba(116, 25, 32, 1) 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -29,7 +30,7 @@ body {
 
 /* Form Container */
 .form-container {
-    background-color: rgba(139, 34, 42, 0.8);
+    background-color: rgba(116, 25, 32, 1);
     padding: 40px 30px;
     border-radius: 8px;
     opacity: 0;
