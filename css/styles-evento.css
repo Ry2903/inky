@@ -356,6 +356,80 @@ body {
     display: none;
 }
 
+.btn-desfazer {
+    padding: 8px 16px;
+    background-color: transparent;
+    color: #c1343f;
+    border: 2px solid #c1343f;
+    border-radius: 4px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-desfazer:hover {
+    background-color: #c1343f;
+    color: white;
+}
+
+/* Botões de check-in / desfazer (todos os usuários) */
+.btn-validar,
+.btn-validado {
+    flex: 1; /* ocupa espaço disponível */
+    min-width: 120px; /* não fica muito pequeno no mobile */
+    text-align: center;
+}
+
+/* Botão de desfazer check-in */
+.btn-validado {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 2px solid #ddd;
+}
+
+.btn-validado:hover {
+    border-color: #c1343f;
+    color: #c1343f;
+}
+
+/* Ajuste das ações dos participantes no mobile */
+@media (max-width: 768px) {
+    .participante-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .btn-validar,
+    .btn-validado {
+        flex: none;
+        width: 100%;
+        font-size: 13px;
+        padding: 10px 0;
+    }
+
+    .btn-remover {
+        width: 100%;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-validar,
+    .btn-validado {
+        font-size: 12px;
+        padding: 8px 0;
+    }
+
+    .btn-remover {
+        font-size: 13px;
+    }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header-content {
